@@ -1,0 +1,9 @@
+* Recruitment campaign creation and editing
+* Dynamic routing to a campaign based on url, no json but direct html
+* Submitting a signup
+* Sending a confirmation email with a link to click for confirmation
+* Click on confirmation link will confirm account (perform some user interaction so this can not happen by script)
+* Password forgotten schema
+* Triggering a password forgotten action
+* Dynamic routing to a password forgotten action based on a randon generated url
+* Email sending
