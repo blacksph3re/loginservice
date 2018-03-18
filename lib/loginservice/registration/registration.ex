@@ -7,6 +7,7 @@ defmodule Loginservice.Registration do
   alias Loginservice.Repo
 
   alias Loginservice.Registration.Campaign
+  alias Loginservice.Registration.MailConfirmation
 
   @doc """
   Returns the list of campaigns.
@@ -36,6 +37,10 @@ defmodule Loginservice.Registration do
 
   """
   def get_campaign!(id), do: Repo.get!(Campaign, id)
+
+  # Gets a campaign by url
+  def get_campaign_by_url!(campaign_url), do: Repo.get_by!(Campaign, url: campaign_url, active: true)
+
 
   @doc """
   Creates a campaign.
@@ -100,5 +105,10 @@ defmodule Loginservice.Registration do
   """
   def change_campaign(%Campaign{} = campaign) do
     Campaign.changeset(campaign, %{})
+  end
+
+  def get_confirmation_by_url!(confirmation_url) do
+    Repo.get_by!(MailConfirmation, url: confirmation_url)
+    |> Repo.preload([submission: [:campaign]])
   end
 end

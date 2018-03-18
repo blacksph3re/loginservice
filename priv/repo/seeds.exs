@@ -9,3 +9,14 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias Loginservice.Registration.Campaign
+alias Loginservice.Repo
+
+Repo.insert!(%Campaign{
+  name: "Default recruitment campaign",
+  url: "default",
+  active: true,
+  description_short: "Signup to our app!",
+  description_long: "Really, sign up to our app!"
+})

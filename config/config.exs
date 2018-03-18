@@ -17,6 +17,10 @@ config :loginservice, LoginserviceWeb.Endpoint,
   pubsub: [name: Loginservice.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# You can steal that sendgrid key but it's a free plan anyways
+config :loginservice, Loginservice.Interfaces.Mail,
+  from: "alastair@nico-westerbeck.de",
+  sendgrid_key: "censored"
 
 # Configures Elixir's Logger
 config :logger, :console,

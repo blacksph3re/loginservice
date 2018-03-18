@@ -30,6 +30,16 @@ defmodule Loginservice.RegistrationTest do
       assert Registration.get_campaign!(campaign.id) == campaign
     end
 
+    test "get_campaign_by_url/1 returns the campaign with the given url" do
+      campaign = campaign_fixture()
+      assert Registration.get_campaign_by_url!(campaign.url) == campaign
+    end
+
+    test "get_campaign_by_url/1 does not return inactive campaigns" do
+      campaign = campaign_fixture(%{active: false})
+      assert_raise Ecto.NoResultsError, fn -> Registration.get_campaign_by_url!(campaign.url) end
+    end
+
     test "create_campaign/1 with valid data creates a campaign" do
       assert {:ok, %Campaign{} = campaign} = Registration.create_campaign(@valid_attrs)
       assert campaign.active == true

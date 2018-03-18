@@ -43,7 +43,8 @@ defmodule Loginservice.Mixfile do
       {:cowboy, "~> 1.0"},
       {:guardian, "~> 1.0-beta"},
       {:comeonin, "~> 4.0"},
-      {:bcrypt_elixir, "~> 0.12"}
+      {:bcrypt_elixir, "~> 0.12"},
+      {:httpoison, "~> 1.0"}
     ]
   end
 

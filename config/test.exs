@@ -4,7 +4,8 @@ use Mix.Config
 # you can enable the server option below.
 config :loginservice, LoginserviceWeb.Endpoint,
   http: [port: 4001],
-  server: false
+  server: false,
+  mail_service: :consoleout
 
 # Print only warnings and errors during test
 config :logger, level: :warn
@@ -23,5 +24,6 @@ config :loginservice, Loginservice.Auth.Guardian,
   secret_key: "rrSTfyfvFlFj1JCl8QW/ritOLKzIncRPC5ic0l0ENVUoiSIPBCDrdU6Su5vZHngY"
 
 # Speed up tests by reducing encryption rounds
+# Unfortunately this doesn't work
 #config :comeonin, :bcrypt_log_rounds, 4
 #config :comeonin, :pbkdf2_rounds, 1 

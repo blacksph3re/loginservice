@@ -6,8 +6,11 @@ defmodule Loginservice.Registration.Submission do
   schema "submissions" do
 
     field :responses, :string
-    field :user_id, :id
-    field :campaign_id, :id
+
+    belongs_to :user, Loginservice.Auth.User
+    belongs_to :campaign, Loginservice.Registration.Campaign
+    has_many :mail_confirmations, Loginservice.Registration.MailConfirmation
+
 
     timestamps()
   end
@@ -16,7 +19,7 @@ defmodule Loginservice.Registration.Submission do
   def changeset(submission, attrs) do
     submission
     |> cast(attrs, [:responses, :user_id, :campaign_id])
-    |> validate_required([:responses, :user_id, :campaign_id])
+    |> validate_required([:user_id, :campaign_id])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:campaign_id)
   end

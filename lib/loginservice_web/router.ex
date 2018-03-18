@@ -24,6 +24,7 @@ defmodule LoginserviceWeb.Router do
     post "/renew", LoginController, :renew_token
     get "/user_existence", LoginController, :check_user_existence
     get "/campaigns", CampaignController, :index
+    get "/campaigns/:id", CampaignController, :show
   end
 
   scope "/api", LoginserviceWeb do
@@ -33,9 +34,14 @@ defmodule LoginserviceWeb.Router do
     post "/logout", LoginController, :logout
 
     post "/campaigns", CampaignController, :create
-    get "/campaigns/:id", CampaignController, :show
     put "/campaigns/:id", CampaignController, :update
     delete "/campaigns/:id", CampaignController, :delete
+  end
+
+  scope "/", LoginserviceWeb do
+    pipe_through :browser
+
+    get "/signup/:campaign_url", CampaignController, :signup
   end
 
 end

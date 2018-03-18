@@ -4,11 +4,15 @@ defmodule LoginserviceWeb.CampaignControllerTest do
   alias Loginservice.Registration
   alias Loginservice.Registration.Campaign
   alias Loginservice.Auth
+  alias Loginservice.Repo
+  alias Loginservice.User
 
   @create_attrs %{active: true, callback_url: "some callback_url", name: "some name", url: "some_url", description_short: "some description", description_long: "some long description"}
   @update_attrs %{active: false, callback_url: "some updated callback_url", name: "some updated name", url: "some_updated_url", description_short: "some other description"}
   @invalid_attrs %{active: nil, callback_url: nil, name: nil, url: nil}
   @valid_user_attrs %{email: "some@email.com", name: "some name", password: "some password", active: true}
+  @valid_submission %{username: "some new username", password: "some new password", email: "some@email.com", responses: nil}
+  @invalid_submission %{username: nil, password: nil, email: nil, responses: nil}
 
   def fixture(:campaign) do
     {:ok, campaign} = Registration.create_campaign(@create_attrs)
@@ -117,6 +121,58 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       assert_error_sent 404, fn ->
         get conn, campaign_path(conn, :show, campaign)
       end
+    end
+  end
+
+  describe "signup page" do
+    setup [:create_campaign]
+
+    test "renders signup page for existing campaign", %{conn: conn, campaign: campaign} do
+      conn = put_req_header(conn, "accept", "text/html")
+      conn = get conn, campaign_path(conn, :signup, campaign.url)
+      assert html_response(conn, 200)
+    end
+
+    test "renders 404 for non-existing page", %{conn: conn} do
+      conn = put_req_header(conn, "accept", "text/html")
+      assert_error_sent 404, fn ->
+        get conn, campaign_path(conn, :signup, "nonexisting_campaign")
+      end
+    end
+  end
+
+  describe "submit signup" do
+    setup [:create_campaign]
+
+    test "a valid submission returns successful status code", %{conn: conn, campaign: campaign} do 
+      conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
+      assert json_response(conn, 200)
+    end
+
+    test "a invalid submission returns an error", %{conn: conn, campaign: campaign} do
+      conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @invalid_submission
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "a valid submission creates a user object, a submission and a mail confirmation in db", %{conn: conn, campaign: campaign} do
+      conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
+      assert json_response(conn, 200)
+      
+      user = Repo.get_by(User, username: @valid_submission.username)
+      assert user != nil
+      assert user.active == false
+
+      submission = Repo.get_by(Loginservice.Registration.Submission, user_id: user.id)
+      assert submission != nil
+
+      mail_confirmation = Repo.get_by(Loginservice.Registration.MailConfirmation, submission_id: submission.id)
+      assert mail_confirmation != nil
+    end
+
+    test "a valid submission sends a confirmation mail to the user, which activates the account", %{conn: conn, campaign: campaign} do
+      conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
+      assert json_response(conn, 200)
+      assert false
     end
   end
 

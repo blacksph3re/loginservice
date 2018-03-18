@@ -38,4 +38,21 @@ defmodule LoginserviceWeb.CampaignController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  # Submit a new user registration
+  def submit(conn, %{"id" => id, "submission" => submission}) do
+    
+  end
+
+  # HTML view for a signup, maybe delete it?
+  def signup(conn, %{"campaign_url" => campaign_url}) do
+    campaign = Registration.get_campaign_by_url!(campaign_url)
+    render(conn, "signup.html", campaign: campaign)
+  end
+
+  # Confirm a users mail because he clicked the right link
+  def confirm_mail(conn, %{"confirmation_url" => confirmation_url}) do
+    confirmation = Registration.get_confirmation_by_url!(confirmation_url)
+    render(conn, "email_confirmed.html", confirmation: confirmation)
+  end
 end

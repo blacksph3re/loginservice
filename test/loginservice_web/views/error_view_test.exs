@@ -6,7 +6,7 @@ defmodule LoginserviceWeb.ErrorViewTest do
 
   test "renders 404.html" do
     assert render_to_string(LoginserviceWeb.ErrorView, "404.html", []) ==
-           "Not Found"
+           "Page Not Found"
   end
 
   test "renders 500.html" do
