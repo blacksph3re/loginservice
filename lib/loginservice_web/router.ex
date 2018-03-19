@@ -23,6 +23,9 @@ defmodule LoginserviceWeb.Router do
     post "/login", LoginController, :login
     post "/renew", LoginController, :renew_token
     get "/user_existence", LoginController, :check_user_existence
+    post "/password_reset", LoginController, :password_reset
+    post "/confirm_reset_password/:reset_url", LoginController, :confirm_password_reset
+
     get "/campaigns", CampaignController, :index
     get "/campaigns/:campaign_url", CampaignController, :show
     post "/campaigns/:campaign_url", CampaignController, :submit

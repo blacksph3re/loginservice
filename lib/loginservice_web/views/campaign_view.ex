@@ -10,6 +10,10 @@ defmodule LoginserviceWeb.CampaignView do
     %{data: render_one(campaign, CampaignView, "campaign.json")}
   end
 
+  def render("success.json", %{}) do
+    %{success: true}
+  end
+
   def render("campaign.json", %{campaign: campaign}) do
     %{id: campaign.id,
       name: campaign.name,
@@ -18,13 +22,5 @@ defmodule LoginserviceWeb.CampaignView do
       description_short: campaign.description_short,
       description_long: campaign.description_long,
       callback_url: campaign.callback_url}
-  end
-
-  def render("submitted.json", %{submission: submission}) do
-    %{success: true}
-  end
-
-  def render("email_confirmed.json", %{confirmation: confirmation}) do
-    %{success: true}
   end
 end

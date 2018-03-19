@@ -13,13 +13,15 @@ defmodule Loginservice.Registration.MailConfirmation do
   @doc false
   def changeset(mail_confirmation, attrs) do
     mail_confirmation
-    |> cast(attrs, [:submission_id])
-    |> validate_required([:submission_id])
+    |> cast(attrs, [:submission_id, :url])
+    |> validate_required([:submission_id, :url])
     |> foreign_key_constraint(:submission_id)
-    |> random_url()
+    |> put_url_hash()
   end
 
-  defp random_url(changeset) do
-    change(changeset, url: :crypto.strong_rand_bytes(32) |> Base.url_encode64 |> binary_part(0, 32))
+    # Hash the url so an attacker with db read access can't create a user account for a mail he doesn't posess
+  defp put_url_hash(%Ecto.Changeset{valid?: true, changes: %{url: url}} = changeset) do
+    change(changeset, url: :crypto.hash(:sha256, url) |> Base.encode64)
   end
+  defp put_url_hash(changeset), do: changeset
 end

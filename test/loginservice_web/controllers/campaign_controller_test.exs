@@ -124,23 +124,6 @@ defmodule LoginserviceWeb.CampaignControllerTest do
     end
   end
 
-  describe "signup page" do
-    setup [:create_campaign]
-
-    test "renders signup page for existing campaign", %{conn: conn, campaign: campaign} do
-      conn = put_req_header(conn, "accept", "text/html")
-      conn = get conn, campaign_path(conn, :signup, campaign.url)
-      assert html_response(conn, 200)
-    end
-
-    test "renders 404 for non-existing page", %{conn: conn} do
-      conn = put_req_header(conn, "accept", "text/html")
-      assert_error_sent 404, fn ->
-        get conn, campaign_path(conn, :signup, "nonexisting_campaign")
-      end
-    end
-  end
-
   describe "submit signup" do
     setup [:create_campaign]
 
@@ -171,14 +154,20 @@ defmodule LoginserviceWeb.CampaignControllerTest do
     end
 
     test "a valid submission sends a confirmation mail to the user", %{conn: conn, campaign: campaign} do
+      :ets.delete_all_objects(:saved_mail)
       conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
       assert json_response(conn, 201)
       assert :ets.lookup(:saved_mail, @valid_submission.email) != []
     end
-
+    
     test "a confirmation mail contains a link over which the user can activate it's account", %{conn: conn, campaign: campaign} do
+      :ets.delete_all_objects(:saved_mail)
       conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
       assert json_response(conn, 201)
+      url = :ets.lookup(:saved_mail, @valid_submission.email)
+      |> assert
+      |> Enum.at(0)
+      |> parse_url_from_mail()
 
       user = Repo.get_by(User, name: @valid_submission.name)
       assert user != nil
@@ -190,10 +179,11 @@ defmodule LoginserviceWeb.CampaignControllerTest do
 
       mail_confirmation = Repo.get_by(Loginservice.Registration.MailConfirmation, submission_id: submission.id)
       assert mail_confirmation != nil
+      assert mail_confirmation.url != url # It should be hashed in the db
 
       conn = recycle(conn)
 
-      conn = post conn, campaign_path(conn, :confirm_mail, mail_confirmation.url)
+      conn = post conn, campaign_path(conn, :confirm_mail, url)
       assert json_response(conn, 200)
 
       # User is active
@@ -214,5 +204,17 @@ defmodule LoginserviceWeb.CampaignControllerTest do
   defp create_campaign(_) do
     campaign = fixture(:campaign)
     {:ok, campaign: campaign}
+  end
+
+  defp parse_url_from_mail({_, _, content, _}) do
+    # Parse the url token from a content which looks like this:
+    # To confirm your email, visit www.alastair.com/registration/confirm_mail/vXMkHWvQETck73sjQpccFDgQQuavIoDZ
+
+    Application.get_env(:loginservice, :url_prefix) <> "confirm_mail/"
+    |> Regex.escape
+    |> (&(&1 <> "([^\s]*)")).() # esotheric elixir... I am concatenating that regex string to the string in the pipe
+    |> Regex.compile!
+    |> Regex.run(content)
+    |> Enum.at(1)
   end
 end

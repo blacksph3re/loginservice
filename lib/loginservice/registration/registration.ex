@@ -109,7 +109,9 @@ defmodule Loginservice.Registration do
   end
 
   def get_confirmation_by_url!(confirmation_url) do
-    Repo.get_by!(MailConfirmation, url: confirmation_url)
+    hash = :crypto.hash(:sha256, confirmation_url) |> Base.encode64
+
+    Repo.get_by!(MailConfirmation, url: hash)
     |> Repo.preload([submission: [:campaign, :user]])
   end
 
@@ -125,13 +127,13 @@ defmodule Loginservice.Registration do
   end
 
   def send_confirmation_mail(user, submission) do
-    with {:ok, confirmation} <- create_confirmation_object(submission),
-      {:ok} <- dispatch_confirmation_mail(user, confirmation),
+    with {:ok, confirmation, url} <- create_confirmation_object(submission),
+      {:ok} <- dispatch_confirmation_mail(user, url),
     do: {:ok, confirmation}
   end
 
-  defp dispatch_confirmation_mail(user, confirmation) do
-    url = Application.get_env(:loginservice, :url_prefix) <> confirmation.url
+  defp dispatch_confirmation_mail(user, url) do
+    url = Application.get_env(:loginservice, :url_prefix) <> "confirm_mail/" <> url
     case Loginservice.Interfaces.Mail.send_mail(user.email, "Confirm your email address", "To confirm your email, visit " <> url) do
       true -> {:ok}
       false -> {:error, "Could not dispatch mail"}
@@ -139,9 +141,16 @@ defmodule Loginservice.Registration do
   end
 
   defp create_confirmation_object(submission) do
-    %MailConfirmation{}
-    |> MailConfirmation.changeset(%{submission_id: submission.id})
+    url = Loginservice.random_url()
+
+    res = %MailConfirmation{}
+    |> MailConfirmation.changeset(%{submission_id: submission.id, url: url})
     |> Repo.insert()
+
+    case res do
+      {:ok, confirmation} -> {:ok, confirmation, url}
+      res -> res
+    end
   end
 
   def confirm_mail(confirmation) do

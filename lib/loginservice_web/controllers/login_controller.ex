@@ -32,4 +32,16 @@ defmodule LoginserviceWeb.LoginController do
   def check_user_existence(conn, %{"username" => username}) do
     render(conn, "user_existence.json", exists: Auth.check_user_existence(username))
   end
+
+  def password_reset(conn, %{"email" => email}) do
+    with {:ok, _} <- Auth.trigger_password_reset(email) do
+      render(conn, "success.json")
+    end
+  end
+
+  def confirm_password_reset(conn, %{"reset_url" => reset_url, "password" => password}) do
+    with {:ok, _} <- Auth.execute_password_reset(reset_url, password) do
+      render(conn, "success.json")     
+    end
+  end
 end

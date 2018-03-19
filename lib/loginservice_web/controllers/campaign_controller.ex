@@ -47,21 +47,15 @@ defmodule LoginserviceWeb.CampaignController do
          {:ok, _data} <- Registration.send_confirmation_mail(user, submission) do
       conn
       |> put_status(:created)
-      |> render("submitted.json", submission: submission)
+      |> render("success.json")
     end
-  end
-
-  # HTML view for a signup, maybe delete it?
-  def signup(conn, %{"campaign_url" => campaign_url}) do
-    campaign = Registration.get_campaign_by_url!(campaign_url)
-    render(conn, "signup.html", campaign: campaign)
   end
 
   # Confirm a users mail because he clicked the right link
   def confirm_mail(conn, %{"confirmation_url" => confirmation_url}) do
     confirmation = Registration.get_confirmation_by_url!(confirmation_url)
     with {:ok} <- Registration.confirm_mail(confirmation) do
-      render(conn, "email_confirmed.json", confirmation: confirmation)
+      render(conn, "success.json")
     end
   end
 end

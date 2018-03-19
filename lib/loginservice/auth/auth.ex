@@ -8,12 +8,15 @@ defmodule Loginservice.Auth do
 
   alias Loginservice.Auth.User
   alias Loginservice.Auth.RefreshToken
+  alias Loginservice.Auth.PasswordReset
 
   def list_users do
     Repo.all(User)
   end
 
   def get_user!(id), do: Repo.get!(User, id)
+
+  def get_user_by_email!(email), do: Repo.get_by!(User, email: email)
 
   def create_user(attrs \\ %{}) do
     %User{}
@@ -143,5 +146,53 @@ defmodule Loginservice.Auth do
       true -> :ok
       false -> {:error, "User not activated"}
     end
+  end
+
+  def trigger_password_reset(email) do
+    user = get_user_by_email!(email)
+
+    with {:ok, password_reset, url} <- create_password_reset_object(user),
+         {:ok} <- send_password_reset_mail(user, url),
+    do: {:ok, password_reset}
+  end
+
+  defp create_password_reset_object(user) do
+    url = Loginservice.random_url()
+
+    res = %PasswordReset{}
+    |> PasswordReset.changeset(%{url: url, user_id: user.id})
+    |> Repo.insert()
+
+    case res do
+      {:ok, password_reset} -> {:ok, password_reset, url}
+      res -> res
+    end
+  end
+
+  defp send_password_reset_mail(user, url) do
+    url = Application.get_env(:loginservice, :url_prefix) <> "confirm_reset_password/" <> url
+    case Loginservice.Interfaces.Mail.send_mail(user.email, "Reset your password", "To reset your password, visit " <> url) do
+      true -> {:ok}
+      false -> {:error, "Could not dispatch mail"}
+    end
+  end
+
+  def get_password_reset_by_url!(reset_url) do
+    hash = :crypto.hash(:sha256, reset_url) |> Base.encode64
+
+    Repo.get_by!(PasswordReset, url: hash)
+    |> Repo.preload([:user])
+  end
+
+  def execute_password_reset(reset_url, password) do
+    password_reset = get_password_reset_by_url!(reset_url)
+
+    res = password_reset.user
+    |> User.changeset(%{password: password})
+    |> Repo.update()
+
+    Repo.delete!(password_reset)
+
+    res
   end
 end

@@ -6,7 +6,8 @@ defmodule Loginservice.Auth.RefreshToken do
   schema "refresh_tokens" do
     field :device, :string
     field :token, :string
-    field :user_id, :id
+
+    belongs_to :user, Loginservice.Auth.User
 
     timestamps()
   end
