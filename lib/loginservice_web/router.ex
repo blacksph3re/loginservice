@@ -24,7 +24,9 @@ defmodule LoginserviceWeb.Router do
     post "/renew", LoginController, :renew_token
     get "/user_existence", LoginController, :check_user_existence
     get "/campaigns", CampaignController, :index
-    get "/campaigns/:id", CampaignController, :show
+    get "/campaigns/:campaign_url", CampaignController, :show
+    post "/campaigns/:campaign_url", CampaignController, :submit
+    post "/confirm_mail/:confirmation_url", CampaignController, :confirm_mail
   end
 
   scope "/api", LoginserviceWeb do

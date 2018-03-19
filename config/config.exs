@@ -7,7 +7,10 @@ use Mix.Config
 
 # General application configuration
 config :loginservice,
-  ecto_repos: [Loginservice.Repo]
+  ecto_repos: [Loginservice.Repo],
+  env: Mix.env,
+  url_prefix: "www.alastair.com/registration/"
+
 
 # Configures the endpoint
 config :loginservice, LoginserviceWeb.Endpoint,
@@ -17,7 +20,6 @@ config :loginservice, LoginserviceWeb.Endpoint,
   pubsub: [name: Loginservice.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
-# You can steal that sendgrid key but it's a free plan anyways
 config :loginservice, Loginservice.Interfaces.Mail,
   from: "alastair@nico-westerbeck.de",
   sendgrid_key: "censored"

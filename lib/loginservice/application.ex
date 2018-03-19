@@ -6,6 +6,11 @@ defmodule Loginservice.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
+    # If consoleout is our mail service, start a ets for testing purposes
+    if Application.get_env(:loginservice, :env) == :test do
+      :ets.new(:saved_mail, [:duplicate_bag, :public, :named_table])
+    end
+
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository

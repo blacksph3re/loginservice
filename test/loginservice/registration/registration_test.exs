@@ -8,7 +8,7 @@ defmodule Loginservice.RegistrationTest do
 
     @field_attrs %{title: "Interests", key: "interests", description: "Which interests do you have", type: "string"}
     @valid_attrs %{active: true, callback_url: "some callback_url", name: "some name", url: "some_url", fields: [@field_attrs], description_short: "short description"}
-    @update_attrs %{active: false, callback_url: "some updated callback_url", name: "some updated name", url: "some_updated_url", description_short: "some updated description"}
+    @update_attrs %{active: true, callback_url: "some updated callback_url", name: "some updated name", url: "some_updated_url", description_short: "some updated description"}
     @invalid_attrs %{active: nil, callback_url: nil, name: nil, url: nil}
 
     def campaign_fixture(attrs \\ %{}) do
@@ -22,7 +22,7 @@ defmodule Loginservice.RegistrationTest do
 
     test "list_campaigns/0 returns all campaigns" do
       campaign = campaign_fixture()
-      assert Registration.list_campaigns() == [campaign]
+      assert Registration.list_campaigns() |> Enum.any?(fn(x) -> x == campaign end)
     end
 
     test "get_campaign!/1 returns the campaign with given id" do
@@ -60,7 +60,7 @@ defmodule Loginservice.RegistrationTest do
       campaign = campaign_fixture()
       assert {:ok, campaign} = Registration.update_campaign(campaign, @update_attrs)
       assert %Campaign{} = campaign
-      assert campaign.active == false
+      assert campaign.active == true
       assert campaign.callback_url == "some updated callback_url"
       assert campaign.name == "some updated name"
       assert campaign.url == "some_updated_url"

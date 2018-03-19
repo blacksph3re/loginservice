@@ -19,4 +19,12 @@ defmodule LoginserviceWeb.CampaignView do
       description_long: campaign.description_long,
       callback_url: campaign.callback_url}
   end
+
+  def render("submitted.json", %{submission: submission}) do
+    %{success: true}
+  end
+
+  def render("email_confirmed.json", %{confirmation: confirmation}) do
+    %{success: true}
+  end
 end

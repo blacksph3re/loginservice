@@ -4,8 +4,10 @@ use Mix.Config
 # you can enable the server option below.
 config :loginservice, LoginserviceWeb.Endpoint,
   http: [port: 4001],
-  server: false,
-  mail_service: :consoleout
+  server: false
+
+config :loginservice, Loginservice.Interfaces.Mail,
+   mail_service: :consoleout
 
 # Print only warnings and errors during test
 config :logger, level: :warn

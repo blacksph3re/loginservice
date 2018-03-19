@@ -8,6 +8,7 @@ defmodule Loginservice.Registration do
 
   alias Loginservice.Registration.Campaign
   alias Loginservice.Registration.MailConfirmation
+  alias Loginservice.Registration.Submission
 
   @doc """
   Returns the list of campaigns.
@@ -109,6 +110,52 @@ defmodule Loginservice.Registration do
 
   def get_confirmation_by_url!(confirmation_url) do
     Repo.get_by!(MailConfirmation, url: confirmation_url)
-    |> Repo.preload([submission: [:campaign]])
+    |> Repo.preload([submission: [:campaign, :user]])
+  end
+
+  def create_submission(campaign, user, responses) do
+    attrs = %{responses: responses,
+      user_id: user.id,
+      campaign_id: campaign.id
+    }
+
+    %Submission{}
+    |> Submission.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def send_confirmation_mail(user, submission) do
+    with {:ok, confirmation} <- create_confirmation_object(submission),
+      {:ok} <- dispatch_confirmation_mail(user, confirmation),
+    do: {:ok, confirmation}
+  end
+
+  defp dispatch_confirmation_mail(user, confirmation) do
+    url = Application.get_env(:loginservice, :url_prefix) <> confirmation.url
+    case Loginservice.Interfaces.Mail.send_mail(user.email, "Confirm your email address", "To confirm your email, visit " <> url) do
+      true -> {:ok}
+      false -> {:error, "Could not dispatch mail"}
+    end
+  end
+
+  defp create_confirmation_object(submission) do
+    %MailConfirmation{}
+    |> MailConfirmation.changeset(%{submission_id: submission.id})
+    |> Repo.insert()
+  end
+
+  def confirm_mail(confirmation) do
+    confirmation.submission
+    |> Submission.changeset(%{mail_confirmed: true})
+    |> Repo.update!
+
+    confirmation.submission.user
+    |> Loginservice.Auth.User.changeset(%{active: true})
+    |> Repo.update!
+
+    confirmation 
+    |> Repo.delete!
+
+    {:ok}
   end
 end
