@@ -7,7 +7,6 @@ services:
 
 before_script:
     - cd docker
-    - docker network create OMS
     - sudo docker-compose build
     - sudo docker-compose up -d
     - sudo docker-compose logs -f loginservice &
