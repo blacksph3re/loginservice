@@ -19,6 +19,7 @@ defmodule Loginservice.Application do
       supervisor(LoginserviceWeb.Endpoint, []),
       # Start your own worker by calling: Loginservice.Worker.start_link(arg1, arg2, arg3)
       # worker(Loginservice.Worker, [arg1, arg2, arg3]),
+      worker(Loginservice.ExpireTokens, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

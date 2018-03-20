@@ -42,7 +42,6 @@ defmodule LoginserviceWeb.CampaignControllerTest do
   end
 
   describe "create campaign" do
-    @tag only: true
     test "renders campaign when data is valid", %{conn: conn} do
       {_user, access_token} = user_fixture()
       conn = put_req_header(conn, "x-auth-token", access_token)
@@ -164,6 +163,7 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       :ets.delete_all_objects(:saved_mail)
       conn = post conn, campaign_path(conn, :submit, campaign.url), submission: @valid_submission
       assert json_response(conn, 201)
+      
       url = :ets.lookup(:saved_mail, @valid_submission.email)
       |> assert
       |> Enum.at(0)
@@ -212,7 +212,7 @@ defmodule LoginserviceWeb.CampaignControllerTest do
 
     Application.get_env(:loginservice, :url_prefix) <> "confirm_mail/"
     |> Regex.escape
-    |> (&(&1 <> "([^\s]*)")).() # esotheric elixir... I am concatenating that regex string to the string in the pipe
+    |> Kernel.<>("([^\s]*)")
     |> Regex.compile!
     |> Regex.run(content)
     |> Enum.at(1)

@@ -10,6 +10,12 @@ defmodule Loginservice do
     :crypto.strong_rand_bytes(32) |> Base.url_encode64 |> binary_part(0, 32)
   end
 
+
+  def ecto_date_in_past(offset_seconds) do
+    NaiveDateTime.utc_now()
+    |> NaiveDateTime.add(-offset_seconds)
+  end
+
   def test_nil(anything) when anything != nil, do: {:ok, anything}
   def test_nil(_anything), do: {:error, nil}
 end

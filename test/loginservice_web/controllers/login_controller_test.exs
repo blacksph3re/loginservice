@@ -31,7 +31,6 @@ defmodule LoginserviceWeb.LoginControllerTest do
     assert json_response(conn, 400)
   end
 
-  @tag only_me: true
   test "with aquired token, access is possible", %{conn: conn} do
     user_fixture()
 
@@ -149,7 +148,7 @@ defmodule LoginserviceWeb.LoginControllerTest do
 
     Application.get_env(:loginservice, :url_prefix) <> "confirm_reset_password/"
     |> Regex.escape
-    |> (&(&1 <> "([^\s]*)")).() # esotheric elixir... I am concatenating that regex string to the string in the pipe
+    |> Kernel.<>("([^\s]*)")
     |> Regex.compile!
     |> Regex.run(content)
     |> Enum.at(1)

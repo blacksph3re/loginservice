@@ -120,5 +120,6 @@ defmodule Loginservice.AuthTest do
       user_fixture(%{active: false})
       assert {:error, _msg} = Loginservice.Auth.login_user("some name", "some password")
     end
+
   end
 end
