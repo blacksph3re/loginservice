@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/blacksph3re/loginservice.svg?branch=master)](https://travis-ci.org/blacksph3re/loginservice)
+
 # Loginservice
 
 This should be the login server of a microservice application. The login server has at it's core a tiny user db with just username, email and password and a token system.
