@@ -58,7 +58,7 @@ config :loginservice, Loginservice.Repo,
   username: "postgres",
   password: "postgres",
   database: "loginservice_dev",
-  hostname: "localhost",
+  hostname: "postgres-loginservice",
   pool_size: 10
 
 config :loginservice, Loginservice.Auth.Guardian,

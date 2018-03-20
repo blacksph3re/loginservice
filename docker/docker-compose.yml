@@ -1,0 +1,37 @@
+version: '3.2'
+
+services:
+    loginservice:
+        build:
+            context: ./$PATH_LOGINSERVICE/loginservice/
+            dockerfile: ./Dockerfile.dev
+        image: blacksph3re/loginservice:dev
+        volumes:
+            - ./$PATH_LOGINSERVICE/../:/usr/src/myapp
+        depends_on:
+            - postgres-loginservice
+        expose:
+            - "4000"
+        labels:
+            - "traefik.frontend.rule=HostRegexp:{domain:[a-z0-9.]+};PathPrefix:/services/loginservice;PathPrefixStrip:/services/loginservice"
+            - "traefik.frontend.priority=100"
+            - "traefik.port=4000"
+            - "traefik.backend=loginservice"
+            - "traefik.enable=true"
+            #- "registry.modules=/static/getModules.json"
+            #- "registry.status=/status"
+
+    postgres-loginservice:
+        image: postgres:latest
+        volumes:
+            - postgres-loginservice:/var/lib/postgresql/data
+        expose:
+            - "5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+
+volumes:
+    postgres-loginservice:
+        driver: "local"
+

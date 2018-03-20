@@ -15,6 +15,11 @@ defmodule LoginserviceWeb.LoginControllerTest do
     user
   end
 
+  test "/status returns true", %{conn: conn} do
+    conn = get conn, login_path(conn, :status)
+    assert json_response(conn, 200)["success"] == true
+  end
+
   test "successful login delivers access and refresh token", %{conn: conn} do
     user_fixture()
 
@@ -43,6 +48,14 @@ defmodule LoginserviceWeb.LoginControllerTest do
 
     conn = get conn, login_path(conn, :user_data)
     assert json_response(conn, 200)
+  end
+
+  test "without aquired token, access is rejected", %{conn: conn} do
+    conn = conn
+    |> put_req_header("x-auth-token", "random-invalid-token")
+
+    conn = get conn, login_path(conn, :user_data)
+    assert json_response(conn, 403)
   end
 
   test "refresh token can be used to get new access tokens", %{conn: conn} do
@@ -140,6 +153,17 @@ defmodule LoginserviceWeb.LoginControllerTest do
     assert json_response(conn, 200)["refresh_token"]
     assert json_response(conn, 200)["access_token"]
 
+  end
+
+  test "cannot confirm passwort reset without a valid token", %{conn: conn} do
+    user = user_fixture()
+
+    assert_error_sent 404, fn ->
+      post conn, login_path(conn, :confirm_password_reset, "invalid_url"), password: "new password"
+    end
+
+    conn = post conn, login_path(conn, :login), username: user.name, password: "new password"
+    assert json_response(conn, 400)
   end
 
   defp parse_url_from_mail({_, _, content, _}) do

@@ -15,14 +15,23 @@ defmodule Loginservice.ExpireTokens do
   def handle_info(:work, state) do
     expire_mail_confirmations()
     expire_password_resets()
+    expire_refresh_tokens()
 
     schedule_work() # Reschedule once more
     {:noreply, state}
   end
 
+  def expire_refresh_tokens() do
+    expiry = Loginservice.ecto_date_in_past(Application.get_env(:loginservice, :ttl_refresh))
+    query = from u in Loginservice.Auth.RefreshToken,
+      where: u.inserted_at < ^expiry
+
+    Loginservice.Repo.delete_all(query)
+  end
+
   def expire_mail_confirmations() do
     # Pipeline of death to find a date in the past
-    expiry = Loginservice.ecto_date_in_past(2 * 60 * 60) # Mail confirmation expires after 2 hours 
+    expiry = Loginservice.ecto_date_in_past(Application.get_env(:loginservice, :ttl_mail_confirmation)) 
     query = from u in Loginservice.Registration.MailConfirmation,
       where: u.inserted_at < ^expiry
 
@@ -30,7 +39,7 @@ defmodule Loginservice.ExpireTokens do
   end
 
   def expire_password_resets() do
-    expiry = Loginservice.ecto_date_in_past(15 * 60) # Password reset expires after 15 minutes
+    expiry = Loginservice.ecto_date_in_past(Application.get_env(:loginservice, :ttl_password_reset))
     query = from u in Loginservice.Auth.PasswordReset,
       where: u.inserted_at < ^expiry
 
@@ -39,6 +48,6 @@ defmodule Loginservice.ExpireTokens do
 
 
   defp schedule_work() do
-    Process.send_after(self(), :work, 5 * 60 * 1000) # Every 5 minutes
+    Process.send_after(self(), :work, 5 * 60 * 1000) # Every 5 minutes check for expired stuff
   end
 end

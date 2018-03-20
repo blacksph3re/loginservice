@@ -5,6 +5,12 @@ defmodule LoginserviceWeb.LoginController do
 
   action_fallback LoginserviceWeb.FallbackController
 
+  def status(conn, _params) do
+    conn 
+    |> put_resp_content_type("application/json") 
+    |> send_resp(200, "{\"success\": true}")
+  end
+
   def login(conn, %{"username" => username, "password" => password}) do
     with {:ok, _user, access, refresh} <- Auth.login_user(username, password) do
       render(conn, "login.json", access: access, refresh: refresh)

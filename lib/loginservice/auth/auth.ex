@@ -100,7 +100,7 @@ defmodule Loginservice.Auth do
 
   # Create a longlived refresh token
   def create_refresh_token(user, device) do
-    with {:ok, refresh_token, _claims} <- Loginservice.Auth.Guardian.encode_and_sign(user, %{}, token_type: "refresh", ttl: {2, :weeks}),
+    with {:ok, refresh_token, _claims} <- Loginservice.Auth.Guardian.encode_and_sign(user, %{}, token_type: "refresh", ttl: {Application.get_env(:loginservice, :ttl_refresh), :seconds}),
       {:ok, refresh_token_db} <- save_refresh_token(refresh_token, user, device),
     do: {:ok, refresh_token, refresh_token_db}
   end
@@ -114,7 +114,7 @@ defmodule Loginservice.Auth do
 
   # Access tokens are shortlived and not saved in db, they are only cryptographically verified
   def create_access_token(user, refresh_token_db) do
-    Loginservice.Auth.Guardian.encode_and_sign(user, %{name: user.name, refresh: refresh_token_db.id}, token_type: "access", ttl: {1, :hours})
+    Loginservice.Auth.Guardian.encode_and_sign(user, %{name: user.name, refresh: refresh_token_db.id}, token_type: "access", ttl: {Application.get_env(:loginservice, :ttl_access), :seconds})
   end
 
   # Fetch a user from DB

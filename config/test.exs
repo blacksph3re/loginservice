@@ -18,7 +18,7 @@ config :loginservice, Loginservice.Repo,
   username: "postgres",
   password: "postgres",
   database: "loginservice_test",
-  hostname: "localhost",
+  hostname: "postgres-loginservice",
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :loginservice, Loginservice.Auth.Guardian,

@@ -83,6 +83,7 @@ defmodule Loginservice.AuthTest do
     test "refute bad credentials" do
       user_fixture()
       assert {:error, _msg} = Loginservice.Auth.login_user("some name", "some invalid password")
+      assert {:error, _msg} = Loginservice.Auth.login_user("some invalid name", "some password")
     end
 
     test "login provides user with working access and refresh tokens" do
@@ -90,6 +91,23 @@ defmodule Loginservice.AuthTest do
       assert {:ok, _user, access, refresh} = Loginservice.Auth.login_user("some name", "some password")
       assert {:ok, _user, _claims} = Loginservice.Auth.check_access_token(access)
       assert {:ok, _user, _claims} = Loginservice.Auth.check_refresh_token(refresh)
+    end
+
+    @tag only: true
+    test "logout with access token provided invalidates that access token" do
+      user_fixture()
+      assert {:ok, _user, _access, refresh} = Loginservice.Auth.login_user("some name", "some password")
+      assert {:ok, _user, refresh_db} = Loginservice.Auth.check_refresh_token(refresh)
+      assert {:ok, _token} = Loginservice.Auth.logout_token(refresh_db.id)
+      assert {:error, _msg} = Loginservice.Auth.check_refresh_token(refresh)
+    end
+
+    test "logout from all devices removes all access tokens" do
+      user = user_fixture()
+      assert {:ok, _user, _access, refresh} = Loginservice.Auth.login_user("some name", "some password")
+      assert {:ok, _user, _refresh_db} = Loginservice.Auth.check_refresh_token(refresh)
+      Loginservice.Auth.logout_user(user)
+      assert {:error, _msg} = Loginservice.Auth.check_refresh_token(refresh)
     end
 
     test "check_access_token/1 refuses invalid tokens" do

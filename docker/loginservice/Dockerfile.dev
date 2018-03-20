@@ -1,0 +1,16 @@
+FROM elixir:alpine
+
+RUN mkdir -p /usr/src/myapp \
+	&& mkdir -p /usr/src/scripts \
+	&& mix local.hex --force \
+  && mix local.rebar --force \
+	&& apk add --update --no-cache nodejs nodejs-npm make
+
+ADD bootstrap.sh /usr/src/scripts/bootstrap.sh
+ADD wait.sh /usr/src/scripts/wait.sh
+
+WORKDIR /usr/src/myapp
+
+EXPOSE 4000
+
+CMD ash /usr/src/scripts/bootstrap.sh && mix phx.server

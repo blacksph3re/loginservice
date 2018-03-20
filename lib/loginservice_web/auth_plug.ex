@@ -14,6 +14,8 @@ defmodule Loginservice.Plugs.Auth do
     else
       {:error, _msg} -> 
         conn
+        |> put_status(:forbidden)
+        |> put_resp_content_type("application/json")
         |> send_resp(403, Poison.encode!(%{success: false, error: "Invalid access token"}))
         |> halt
     end

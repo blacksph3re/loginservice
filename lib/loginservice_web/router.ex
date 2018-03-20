@@ -1,13 +1,13 @@
 defmodule LoginserviceWeb.Router do
   use LoginserviceWeb, :router
 
-  pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-  end
+#  pipeline :browser do
+#    plug :accepts, ["html"]
+#    plug :fetch_session
+#    plug :fetch_flash
+#    plug :protect_from_forgery
+#    plug :put_secure_browser_headers
+#  end
 
   pipeline :api do
     plug :accepts, ["json"]
@@ -19,6 +19,8 @@ defmodule LoginserviceWeb.Router do
 
   scope "/api", LoginserviceWeb do
     pipe_through :api # Use the default browser stack
+
+    get "/status", LoginController, :status
 
     post "/login", LoginController, :login
     post "/renew", LoginController, :renew_token
@@ -41,12 +43,6 @@ defmodule LoginserviceWeb.Router do
     post "/campaigns", CampaignController, :create
     put "/campaigns/:id", CampaignController, :update
     delete "/campaigns/:id", CampaignController, :delete
-  end
-
-  scope "/", LoginserviceWeb do
-    pipe_through :browser
-
-    get "/signup/:campaign_url", CampaignController, :signup
   end
 
 end

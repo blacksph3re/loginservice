@@ -2,6 +2,7 @@ defmodule Loginservice.ExpireTokensTest do
   use Loginservice.DataCase
 
   alias Loginservice.Auth.PasswordReset
+  alias Loginservice.Auth.RefreshToken
   alias Loginservice.Registration.MailConfirmation
 
   @valid_user_attrs %{email: "some@email.com", name: "some name", password: "some password", active: true}
@@ -36,28 +37,33 @@ defmodule Loginservice.ExpireTokensTest do
     |> Ecto.Changeset.force_change(:inserted_at, time)
     |> Repo.insert!()
 
-    {reset, confirmation}
+    refresh = %RefreshToken{}
+    |> RefreshToken.changeset(%{user_id: user.id, token: "bla", device: "bla"})
+    |> Ecto.Changeset.force_change(:inserted_at, time)
+    |> Repo.insert!()
+
+    {reset, confirmation, refresh}
   end
 
   test "expire tokens worker leaves useful tokens intact" do
     token_fixture() 
     
-    Loginservice.ExpireTokens.expire_mail_confirmations()
-    Loginservice.ExpireTokens.expire_password_resets()
+    Loginservice.ExpireTokens.handle_info(:work, {})
 
     assert Repo.all(MailConfirmation) != []
     assert Repo.all(PasswordReset) != []
+    assert Repo.all(RefreshToken) != []
   end
 
   test "expire tokens worker removes outdated tokens" do
-    Loginservice.ecto_date_in_past(5 * 60 * 60)
+    Loginservice.ecto_date_in_past(Application.get_env(:loginservice, :ttl_refresh) * 2)
     |> token_fixture()
 
-    Loginservice.ExpireTokens.expire_mail_confirmations()
-    Loginservice.ExpireTokens.expire_password_resets()
+    Loginservice.ExpireTokens.handle_info(:work, {})    
 
     assert Repo.all(MailConfirmation) == []
     assert Repo.all(PasswordReset) == []
+    assert Repo.all(RefreshToken) == []
   end
 
 end

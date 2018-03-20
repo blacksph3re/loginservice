@@ -1,0 +1,18 @@
+language: shell
+dist: trusty
+sudo: required
+
+services:
+  - docker
+
+before_script:
+    - cd docker
+    - docker network create OMS
+    - sudo docker-compose build
+    - sudo docker-compose up -d
+    - sudo docker-compose logs -f loginservice &
+    - sudo docker-compose exec loginservice ash /usr/src/scripts/wait.sh
+
+
+script:
+    - sudo docker-compose exec loginservice mix coveralls

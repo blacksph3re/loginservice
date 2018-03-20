@@ -19,6 +19,10 @@ defmodule LoginserviceWeb.ErrorView do
       msg: msg}
   end
 
+  def render("403.json", _assigns) do
+    %{success: false}
+  end
+
   def render("404.html", _assigns) do
     "Page Not Found"
   end

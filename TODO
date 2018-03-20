@@ -12,3 +12,4 @@ x Email sending
 o HTML Email templates
 o Dockerize everything
 x Auto-expiry of mail confirmations and password reset
+o Read secrets from environment variable
