@@ -49,7 +49,8 @@ defmodule Loginservice.Auth do
   # Invalidates all refresh tokens of the user, completely logging him out
   def logout_user(user) do
     query = from u in RefreshToken, where: u.user_id == ^user.id
-    Repo.delete_all(query)
+    {deletes, _} = Repo.delete_all(query)
+    {:ok, deletes}
   end
 
   # Invalidates a single refresh token

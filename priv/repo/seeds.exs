@@ -13,10 +13,13 @@
 alias Loginservice.Registration.Campaign
 alias Loginservice.Repo
 
-Repo.insert!(%Campaign{
-  name: "Default recruitment campaign",
-  url: "default",
-  active: true,
-  description_short: "Signup to our app!",
-  description_long: "Really, sign up to our app!"
-})
+if Repo.all(Campaign) == [] do
+
+  Repo.insert!(%Campaign{
+    name: "Default recruitment campaign",
+    url: "default",
+    active: true,
+    description_short: "Signup to our app!",
+    description_long: "Really, sign up to our app!"
+  })
+end

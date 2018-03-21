@@ -39,6 +39,7 @@ defmodule LoginserviceWeb.Router do
 
     get "/user", LoginController, :user_data
     post "/logout", LoginController, :logout
+    post "/logout/all", LoginController, :logout_all
 
     post "/campaigns", CampaignController, :create
     put "/campaigns/:id", CampaignController, :update

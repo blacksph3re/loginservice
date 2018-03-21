@@ -100,6 +100,27 @@ defmodule LoginserviceWeb.LoginControllerTest do
     assert json_response(conn, 403)
   end
 
+  test "logout_all invalidates all refresh token", %{conn: conn} do
+    user_fixture()
+
+    conn = post conn, login_path(conn, :login), username: "some name", password: "some password"
+    assert refresh = json_response(conn, 200)["refresh_token"]
+    assert access = json_response(conn, 200)["access_token"]
+
+    conn = conn
+    |> recycle()
+    |> put_req_header("x-auth-token", access)
+
+    conn = post conn, login_path(conn, :logout_all)
+    assert json_response(conn, 200)
+
+    conn = conn
+    |> recycle()
+
+    conn = post conn, login_path(conn, :renew_token), refresh_token: refresh
+    assert json_response(conn, 403)
+  end
+
   test "can check for username existence", %{conn: conn} do
     user_fixture()
 

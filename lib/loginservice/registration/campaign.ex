@@ -23,5 +23,6 @@ defmodule Loginservice.Registration.Campaign do
     |> cast(attrs, [:name, :url, :active, :callback_url, :description_long, :description_short])
     |> validate_required([:name, :url, :active, :description_short])
     |> validate_format(:url, ~r/^[A-Za-z0-9_-]*$/)
+    |> unique_constraint(:url)
   end
 end

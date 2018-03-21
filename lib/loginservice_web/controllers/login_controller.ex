@@ -23,6 +23,12 @@ defmodule LoginserviceWeb.LoginController do
     end
   end
 
+  def logout_all(conn, _params) do
+    with {:ok, _} <- Auth.logout_user(conn.assigns.user) do
+      render(conn, "success.json")
+    end
+  end
+
   def renew_token(conn, %{"refresh_token" => token}) do
     with {:ok, access} <- Auth.renew_token(token) do
       render(conn, "login.json", access: access, refresh: "unchanged")

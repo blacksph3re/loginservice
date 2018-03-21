@@ -2,7 +2,7 @@
 
 # Loginservice
 
-This should be the login server of a microservice application. The login server has at it's core a tiny user db with just username, email and password and a token system.
+This should be the login server of a microservice application. The login server has at it's core a tiny user db with just username, email and password and a token system. The API can be found [here](https://loginservice.docs.apiary.io/)
 
 ## Token system
 

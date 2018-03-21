@@ -10,6 +10,8 @@ x Triggering a password forgotten action
 x Confirming a password forgotten action through a token
 x Email sending
 o HTML Email templates
-o Dockerize everything
+x Dockerize everything
 x Auto-expiry of mail confirmations and password reset
 o Read secrets from environment variable
+o Document API
+o Don't seed when already seeded
