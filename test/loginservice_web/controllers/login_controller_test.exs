@@ -2,6 +2,7 @@ defmodule LoginserviceWeb.LoginControllerTest do
   use LoginserviceWeb.ConnCase, async: true
 
   @valid_attrs %{email: "some@email.com", name: "some name", password: "some password", active: true}
+  @update_attrs %{email: "someupdated@email.com", name: "some updated name", password: "some updated password"}
   alias Loginservice.Auth
   alias Loginservice.Repo
 
@@ -77,6 +78,74 @@ defmodule LoginserviceWeb.LoginControllerTest do
 
     conn = get conn, login_path(conn, :user_data)
     assert json_response(conn, 200)
+  end
+
+  test "user can change his name and email but not his password without providing the previous password", %{conn: conn} do
+    user = user_fixture()
+
+    conn = post conn, login_path(conn, :login), username: "some name", password: "some password"
+    assert access = json_response(conn, 200)["access_token"]
+
+    conn = conn
+    |> recycle()
+    |> put_req_header("x-auth-token", access)
+
+    conn = put conn, login_path(conn, :edit_user), user: @update_attrs
+    assert json_response(conn, 200)
+
+    user = Repo.get!(Loginservice.Auth.User, user.id)
+    assert user.name == "some updated name"
+    assert user.email == "someupdated@email.com"
+
+    conn = recycle(conn)
+    conn = post conn, login_path(conn, :login), username: @update_attrs.name, password: @update_attrs.password
+    assert json_response(conn, 400)
+
+    conn = recycle(conn)
+    conn = post conn, login_path(conn, :login), username: @update_attrs.name, password: @valid_attrs.password
+    assert json_response(conn, 200)
+  end
+
+  @tag only: true
+  test "user can change his name, email and password in case he provided a correct old password", %{conn: conn} do
+    user = user_fixture()
+
+    conn = post conn, login_path(conn, :login), username: @valid_attrs.name, password: @valid_attrs.password
+    assert access = json_response(conn, 200)["access_token"]
+
+    conn = conn
+    |> recycle()
+    |> put_req_header("x-auth-token", access)
+
+    conn = put conn, login_path(conn, :edit_user), user: @update_attrs, old_password: @valid_attrs.password
+    assert json_response(conn, 200)
+
+    user = Repo.get!(Loginservice.Auth.User, user.id)
+    assert user.name == @update_attrs.name
+    assert user.email == @update_attrs.email
+
+    conn = recycle(conn)
+    conn = post conn, login_path(conn, :login), username: @update_attrs.name, password: @update_attrs.password
+    assert json_response(conn, 200)
+
+    conn = recycle(conn)
+    conn = post conn, login_path(conn, :login), username: @update_attrs.name, password: @valid_attrs.password
+    assert json_response(conn, 400)
+  end
+
+  
+  test "user data change is rejected in case he provided a wrong old password", %{conn: conn} do
+    user_fixture()
+
+    conn = post conn, login_path(conn, :login), username: "some name", password: "some password"
+    assert access = json_response(conn, 200)["access_token"]
+
+    conn = conn
+    |> recycle()
+    |> put_req_header("x-auth-token", access)
+
+    conn = put conn, login_path(conn, :edit_user), user: @update_attrs, old_password: "some invalid password"
+    assert json_response(conn, 400)
   end
 
   test "logout invalidates the refresh token", %{conn: conn} do

@@ -3,11 +3,11 @@ defmodule LoginserviceWeb.CampaignView do
   alias LoginserviceWeb.CampaignView
 
   def render("index.json", %{campaigns: campaigns}) do
-    %{data: render_many(campaigns, CampaignView, "campaign.json")}
+    %{success: true, data: render_many(campaigns, CampaignView, "campaign.json")}
   end
 
   def render("show.json", %{campaign: campaign}) do
-    %{data: render_one(campaign, CampaignView, "campaign.json")}
+    %{success: true, data: render_one(campaign, CampaignView, "campaign.json")}
   end
 
   def render("success.json", %{}) do

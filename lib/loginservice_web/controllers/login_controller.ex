@@ -41,6 +41,25 @@ defmodule LoginserviceWeb.LoginController do
     render(conn, "user.json", conn.assigns.user)
   end
 
+  # With provided password the user can also edit his password
+  def edit_user(conn, %{"user" => user_params, "old_password" => old_password}) when not(is_nil(old_password)) do
+    user_params = Map.delete(user_params, "active")
+    with {:ok, _} <- Auth.authenticate_user(conn.assigns.user.name, old_password), 
+        {:ok, user} <- Auth.update_user(conn.assigns.user, user_params) do
+      render(conn, "user.json", user)      
+    end
+  end
+
+  # Without having provided his old password the password field will be ignored if present
+  def edit_user(conn, %{"user" => user}) do
+    user = user
+    |> Map.delete("password")
+    |> Map.delete("active")
+    with {:ok, user} <- Auth.update_user(conn.assigns.user, user) do
+      render(conn, "user.json", user)
+    end
+  end
+
   def check_user_existence(conn, %{"username" => username}) do
     render(conn, "user_existence.json", exists: Auth.check_user_existence(username))
   end

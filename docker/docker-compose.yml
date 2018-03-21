@@ -12,6 +12,8 @@ services:
             - postgres-loginservice
         expose:
             - "4000"
+        ports:
+            - "4000:4000"
         labels:
             - "traefik.frontend.rule=HostRegexp:{domain:[a-z0-9.]+};PathPrefix:/services/loginservice;PathPrefixStrip:/services/loginservice"
             - "traefik.frontend.priority=100"

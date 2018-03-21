@@ -19,7 +19,9 @@ defmodule LoginserviceWeb.LoginView do
   def render("user_data.json", %{login: user}) do
     %{id: user.id,
       name: user.name,
-      email: user.email}
+      email: user.email,
+      inserted_at: user.inserted_at
+    }
   end
 
   def render("user_existence.json", %{exists: exists}) do

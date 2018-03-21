@@ -49,6 +49,7 @@ defmodule LoginserviceWeb.CampaignController do
       |> put_status(:created)
       |> render("success.json")
     end
+    # TODO remove created user or submission in case the submission failed later in the pipeline
   end
 
   # Confirm a users mail because he clicked the right link

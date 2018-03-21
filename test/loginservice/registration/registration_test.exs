@@ -56,6 +56,11 @@ defmodule Loginservice.RegistrationTest do
       assert {:error, %Ecto.Changeset{}} = Registration.create_campaign(@invalid_attrs)
     end
 
+    test "create_campaign/1 with duplicate url returns an error" do
+      assert {:ok, %Campaign{}} = Registration.create_campaign(@valid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Registration.create_campaign(@update_attrs |> Map.put(:url, @valid_attrs.url))
+    end
+ 
     test "update_campaign/2 with valid data updates the campaign" do
       campaign = campaign_fixture()
       assert {:ok, campaign} = Registration.update_campaign(campaign, @update_attrs)

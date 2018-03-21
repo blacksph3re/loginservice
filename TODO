@@ -14,4 +14,5 @@ x Dockerize everything
 x Auto-expiry of mail confirmations and password reset
 o Read secrets from environment variable
 o Document API
-o Don't seed when already seeded
+x Don't seed when already seeded
+O Allow campaign managements only to certain users in the system

@@ -38,6 +38,7 @@ defmodule LoginserviceWeb.Router do
     pipe_through [:api, :authenticated]
 
     get "/user", LoginController, :user_data
+    put "/user", LoginController, :edit_user
     post "/logout", LoginController, :logout
     post "/logout/all", LoginController, :logout_all
 
