@@ -19,7 +19,7 @@ defmodule Helper do
   def read_secret_from_file(nil, fallback), do: fallback
   def read_secret_from_file(file, fallback) do
     case File.read(file) do
-      {:ok, content} -> content |> IO.inspect
+      {:ok, content} -> content
       {:error, _} -> fallback
     end
   end
