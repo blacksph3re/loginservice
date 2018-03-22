@@ -21,10 +21,6 @@ config :loginservice, Loginservice.Repo,
   hostname: "postgres-loginservice",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :loginservice, Loginservice.Auth.Guardian,
-  issuer: "Alastair", 
-  secret_key: "rrSTfyfvFlFj1JCl8QW/ritOLKzIncRPC5ic0l0ENVUoiSIPBCDrdU6Su5vZHngY"
-
 # Speed up tests by reducing encryption rounds
 # Unfortunately this doesn't work
 #config :comeonin, :bcrypt_log_rounds, 4

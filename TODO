@@ -4,7 +4,6 @@ x Submitting a signup
 x Sending a confirmation email with a link to click for confirmation
 x Click on confirmation link will confirm account (perform some user interaction so this can not happen by script)
 o Custom fields in signup form
-o Administrator approval for account activation
 x Password forgotten schema
 x Triggering a password forgotten action
 x Confirming a password forgotten action through a token
@@ -12,7 +11,8 @@ x Email sending
 o HTML Email templates
 x Dockerize everything
 x Auto-expiry of mail confirmations and password reset
-o Read secrets from environment variable
-o Document API
+x Read secrets from file
+x Document API
 x Don't seed when already seeded
 O Allow campaign managements only to certain users in the system
+o Administrator approval for account activation

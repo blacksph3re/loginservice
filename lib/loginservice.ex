@@ -18,4 +18,6 @@ defmodule Loginservice do
 
   def test_nil(anything) when anything != nil, do: {:ok, anything}
   def test_nil(_anything), do: {:error, nil}
+
+
 end

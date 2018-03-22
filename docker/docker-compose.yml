@@ -22,6 +22,13 @@ services:
             - "traefik.enable=true"
             #- "registry.modules=/static/getModules.json"
             #- "registry.status=/status"
+        environment:
+            JWT_ISSUER: Alastair
+            JWT_SECRET_KEY_FILE: /run/secrets/jwt_key
+            SENDGRID_KEY_FILE: /run/secrets/sendgrid_key
+        secrets:
+            - jwt_key
+            - sendgrid_key
 
     postgres-loginservice:
         image: postgres:latest
@@ -32,6 +39,14 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
+
+
+secrets:
+    jwt_key:
+        file: loginservice/jwt_key
+    sendgrid_key:
+        file: loginservice/sendgrid_key
+
 
 volumes:
     postgres-loginservice:

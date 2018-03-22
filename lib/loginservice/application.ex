@@ -11,6 +11,7 @@ defmodule Loginservice.Application do
       :ets.new(:saved_mail, [:duplicate_bag, :public, :named_table])
     end
 
+
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
