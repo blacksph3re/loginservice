@@ -10,10 +10,11 @@ config :loginservice,
   ecto_repos: [Loginservice.Repo],
   env: Mix.env,
   url_prefix: "www.alastair.com/registration/",
-  ttl_refresh: 60 * 60 * 24 * 7 * 2, # 2 weeks
-  ttl_access: 60 * 60, # 1 hour
-  ttl_password_reset: 60 * 15, # 15 Minutes
-  ttl_mail_confirmation: 60 * 60 * 2 # 2 hours
+  ttl_refresh: 60 * 60 * 24 * 7 * 2,  # 2 weeks
+  ttl_access: 60 * 60,                # 1 hour
+  ttl_password_reset: 60 * 15,        # 15 Minutes
+  ttl_mail_confirmation: 60 * 60 * 2, # 2 hours
+  expiry_worker_freq: 5 * 60 * 1000   # 5 Minutes
 
 defmodule Helper do
   def read_secret_from_file(nil, fallback), do: fallback

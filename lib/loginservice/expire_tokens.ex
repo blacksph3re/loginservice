@@ -48,6 +48,6 @@ defmodule Loginservice.ExpireTokens do
 
 
   defp schedule_work() do
-    Process.send_after(self(), :work, 5 * 60 * 1000) # Every 5 minutes check for expired stuff
+    Process.send_after(self(), :work, Application.get_env(:loginservice, :expiry_worker_freq)) # Every 5 minutes check for expired stuff
   end
 end
