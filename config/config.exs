@@ -5,6 +5,17 @@
 # is restricted to this project.
 use Mix.Config
 
+defmodule Helper do
+  def read_secret_from_file(nil, fallback), do: fallback
+  def read_secret_from_file(file, fallback) do
+    case File.read(file) do
+      {:ok, content} -> content
+      {:error, _} -> fallback
+    end
+  end
+end
+
+
 # General application configuration
 config :loginservice,
   ecto_repos: [Loginservice.Repo],
@@ -15,16 +26,6 @@ config :loginservice,
   ttl_password_reset: 60 * 15,        # 15 Minutes
   ttl_mail_confirmation: 60 * 60 * 2, # 2 hours
   expiry_worker_freq: 5 * 60 * 1000   # 5 Minutes
-
-defmodule Helper do
-  def read_secret_from_file(nil, fallback), do: fallback
-  def read_secret_from_file(file, fallback) do
-    case File.read(file) do
-      {:ok, content} -> content
-      {:error, _} -> fallback
-    end
-  end
-end
 
 # Configures the endpoint
 config :loginservice, LoginserviceWeb.Endpoint,
@@ -38,11 +39,12 @@ config :loginservice, Loginservice.Interfaces.Mail,
   from: "alastair@nico-westerbeck.de",
   sendgrid_key: Helper.read_secret_from_file(System.get_env("SENDGRID_KEY_FILE"), "censored")
 
+config :loginservice, Loginservice.Interfaces.CampaignAuthorization,
+  authorization_provider: :superadmin_only
+
 config :loginservice, Loginservice.Auth.Guardian,
   issuer: System.get_env("JWT_ISSUER") || "Alastair", 
   secret_key: Helper.read_secret_from_file(System.get_env("JWT_SECRET_KEY_FILE"), "rrSTfyfvFlFj1JCl8QW/ritOLKzIncRPC5ic0l0ENVUoiSIPBCDrdU6Su5vZHngY")
-
-
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -8,6 +8,7 @@ defmodule Loginservice.Auth.User do
     field :name, :string
     field :password, :string
     field :active, :boolean
+    field :superadmin, :boolean
 
     timestamps()
   end

@@ -20,7 +20,8 @@ defmodule LoginserviceWeb.LoginView do
     %{id: user.id,
       name: user.name,
       email: user.email,
-      inserted_at: user.inserted_at
+      inserted_at: user.inserted_at,
+      superadmin: user.superadmin
     }
   end
 

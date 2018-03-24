@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Loginservice.Registration.Campaign
+alias Loginservice.Auth.User
 alias Loginservice.Repo
 
 if Repo.all(Campaign) == [] do
@@ -22,4 +23,11 @@ if Repo.all(Campaign) == [] do
     description_short: "Signup to our app!",
     description_long: "Really, sign up to our app!"
   })
+
+  Repo.insert!(%User{
+    name: "admin",
+    email: "admin@admin.com",
+    active: true,
+    superadmin: true
+    } |> User.changeset(%{password: "admin1234"}))
 end
