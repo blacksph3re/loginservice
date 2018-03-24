@@ -6,8 +6,8 @@ defmodule Loginservice.AuthTest do
   describe "users" do
     alias Loginservice.Auth.User
 
-    @valid_attrs %{email: "some@email.com", name: "some name", password: "some password", active: true}
-    @update_attrs %{email: "someupdated@email.com", name: "some updated name", password: "some updated password", active: true}
+    @valid_attrs %{email: "some@email.com", name: "some name", password: "some password", active: true, superadmin: false}
+    @update_attrs %{email: "someupdated@email.com", name: "some updated name", password: "some updated password", active: true, superadmin: false}
     @invalid_attrs %{email: nil, name: nil, password: nil}
     @invalid_token "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJBbGFzdGFpciIsImV4cCI6MTUyMjg0NzMyMCwiaWF0IjoxNTIwNDI4MTIwLCJpc3MiOiJBbGFzdGFpciIsImp0aSI6IjI4ZDM3YTIyLTExMzEtNGFjNy04YTlmLWQ2YzU0YTEyZjM1OCIsIm5hbWUiOiJzb21lIG5hbWUiLCJuYmYiOjE1MjA0MjgxMTksInN1YiI6IjcyIiwidHlwIjoiYWNjZXNzIn0.CN5aB844O2_LgYF7Z4lmBOsurjSSBtCmHd2MisahmZkYPSP2AinlcRcCCMpw-wPs_frBi4nwzB-_0CCuNvtHqg"
 
@@ -17,12 +17,12 @@ defmodule Loginservice.AuthTest do
         |> Enum.into(@valid_attrs)
         |> Auth.create_user()
 
-      user
+      Repo.get!(User, user.id)
     end
 
     test "list_users/0 returns all users" do
       user = user_fixture()
-      assert Auth.list_users() == [user]
+      assert Auth.list_users() |> Enum.any?(fn(x) -> x == user end)
     end
 
     test "get_user!/1 returns the user with given id" do
