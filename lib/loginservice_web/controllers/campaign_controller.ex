@@ -6,13 +6,21 @@ defmodule LoginserviceWeb.CampaignController do
 
   action_fallback LoginserviceWeb.FallbackController
 
+  defp check_admin(conn, action, campaign \\ nil) do
+    case Loginservice.Interfaces.CampaignAuthorization.authorize_action(action, conn.assigns.user, campaign) do
+      true -> {:ok}
+      false -> {:forbidden, "You don't have the necessary permissions to " <> Kernel.inspect(action) <> " campaigns"}
+    end
+  end
+
   def index(conn, _params) do
     campaigns = Registration.list_campaigns()
     render(conn, "index.json", campaigns: campaigns)
   end
 
   def create(conn, %{"campaign" => campaign_params}) do
-    with {:ok, %Campaign{} = campaign} <- Registration.create_campaign(campaign_params) do
+    with {:ok} <- check_admin(conn, :create),
+        {:ok, %Campaign{} = campaign} <- Registration.create_campaign(campaign_params) do
       conn
       |> put_status(:created)
       |> render("show.json", campaign: campaign)
@@ -27,14 +35,16 @@ defmodule LoginserviceWeb.CampaignController do
   def update(conn, %{"id" => id, "campaign" => campaign_params}) do
     campaign = Registration.get_campaign!(id)
 
-    with {:ok, %Campaign{} = campaign} <- Registration.update_campaign(campaign, campaign_params) do
+    with {:ok} <- check_admin(conn, :update, campaign),
+        {:ok, %Campaign{} = campaign} <- Registration.update_campaign(campaign, campaign_params) do
       render(conn, "show.json", campaign: campaign)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     campaign = Registration.get_campaign!(id)
-    with {:ok, %Campaign{}} <- Registration.delete_campaign(campaign) do
+    with {:ok} <- check_admin(conn, :delete, campaign),
+        {:ok, %Campaign{}} <- Registration.delete_campaign(campaign) do
       send_resp(conn, :no_content, "")
     end
   end

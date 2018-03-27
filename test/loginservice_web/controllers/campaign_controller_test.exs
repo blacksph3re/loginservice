@@ -24,6 +24,21 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       attrs
       |> Enum.into(@valid_user_attrs)
       |> Auth.create_user()
+    user = user
+      |> User.changeset(%{})
+      |> Ecto.Changeset.force_change(:superadmin, true)
+      |> Repo.update!
+
+    {:ok, _user, access_token, _refresh_token} = Auth.login_user(@valid_user_attrs.name, @valid_user_attrs.password)
+
+    {user, access_token}
+  end
+
+  def user_fixture_nonadmin(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> Enum.into(@valid_user_attrs)
+      |> Auth.create_user()
 
     {:ok, _user, access_token, _refresh_token} = Auth.login_user(@valid_user_attrs.name, @valid_user_attrs.password)
 
@@ -69,6 +84,14 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       conn = post conn, campaign_path(conn, :create), campaign: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    test "allows only admins to create recruitment campaigns", %{conn: conn} do
+      {_user, access_token} = user_fixture_nonadmin()
+      conn = put_req_header(conn, "x-auth-token", access_token)
+
+      conn = post conn, campaign_path(conn, :create), campaign: @create_attrs
+      assert json_response(conn, 403)
+    end
   end
 
   describe "update campaign" do
@@ -101,6 +124,14 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       conn = put conn, campaign_path(conn, :update, campaign), campaign: @invalid_attrs
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    test "allows only admins to update recruitment campaigns", %{conn: conn, campaign: campaign} do
+      {_user, access_token} = user_fixture_nonadmin()
+      conn = put_req_header(conn, "x-auth-token", access_token)
+
+      conn = put conn, campaign_path(conn, :update, campaign), campaign: @update_attrs
+      assert json_response(conn, 403)
+    end
   end
 
   describe "delete campaign" do
@@ -120,6 +151,14 @@ defmodule LoginserviceWeb.CampaignControllerTest do
       assert_error_sent 404, fn ->
         get conn, campaign_path(conn, :show, campaign.url)
       end
+    end
+
+    test "allows only admins to delete campaigns", %{conn: conn, campaign: campaign} do
+      {_user, access_token} = user_fixture_nonadmin()
+      conn = put_req_header(conn, "x-auth-token", access_token)
+
+      conn = delete conn, campaign_path(conn, :delete, campaign)
+      assert response(conn, 403)
     end
   end
 
