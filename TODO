@@ -8,7 +8,7 @@ x Click on confirmation link will confirm account (perform some user interaction
 o Custom fields in signup form
 x Allow campaign managements only to certain users in the system
 o Administrator approval for account activation (separate from campaign manager!) after user confirmed his email
-o Custom actions after sign in
+x Custom actions after sign in
 o OAuth based sign-in
 
 Log-in

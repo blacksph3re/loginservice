@@ -179,7 +179,7 @@ defmodule Loginservice.Auth do
   end
 
   def get_password_reset_by_url!(reset_url) do
-    hash = :crypto.hash(:sha256, reset_url) |> Base.encode64
+    hash = Loginservice.hash_without_salt(reset_url)
 
     Repo.get_by!(PasswordReset, url: hash)
     |> Repo.preload([:user])

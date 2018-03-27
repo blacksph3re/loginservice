@@ -109,7 +109,7 @@ defmodule Loginservice.Registration do
   end
 
   def get_confirmation_by_url!(confirmation_url) do
-    hash = :crypto.hash(:sha256, confirmation_url) |> Base.encode64
+    hash = Loginservice.hash_without_salt(confirmation_url)
 
     Repo.get_by!(MailConfirmation, url: hash)
     |> Repo.preload([submission: [:campaign, :user]])
@@ -161,6 +161,8 @@ defmodule Loginservice.Registration do
     confirmation.submission.user
     |> Loginservice.Auth.User.changeset(%{active: true})
     |> Repo.update!
+
+    Loginservice.Interfaces.UserActivationAction.user_activation_action(confirmation.submission)
 
     confirmation 
     |> Repo.delete!

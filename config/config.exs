@@ -42,6 +42,9 @@ config :loginservice, Loginservice.Interfaces.Mail,
 config :loginservice, Loginservice.Interfaces.CampaignAuthorization,
   authorization_provider: :superadmin_only
 
+config :loginservice, Loginservice.Interfaces.UserActivationAction,
+  action_provider: :do_nothing
+
 config :loginservice, Loginservice.Auth.Guardian,
   issuer: System.get_env("JWT_ISSUER") || "Alastair", 
   secret_key: Helper.read_secret_from_file(System.get_env("JWT_SECRET_KEY_FILE"), "rrSTfyfvFlFj1JCl8QW/ritOLKzIncRPC5ic0l0ENVUoiSIPBCDrdU6Su5vZHngY")

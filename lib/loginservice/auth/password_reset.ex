@@ -21,7 +21,7 @@ defmodule Loginservice.Auth.PasswordReset do
 
   # Hash the url so a hacker with db read access can't reset other peoples passwords
   defp put_url_hash(%Ecto.Changeset{valid?: true, changes: %{url: url}} = changeset) do
-    change(changeset, url: :crypto.hash(:sha256, url) |> Base.encode64)
+    change(changeset, url: Loginservice.hash_without_salt(url))
   end
   defp put_url_hash(changeset), do: changeset
 end
